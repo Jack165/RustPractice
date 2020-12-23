@@ -1,52 +1,56 @@
-use std::sync::mpsc;
 use std::thread;
 use std::time::Duration;
 use std::net::{TcpListener,TcpStream};
 use std::io::{Error,Read,Write};
 use std::time;
 
-#[derive(Debug)]
-struct stud<T1,T2>{
-    id :T1,
-    name:T2
-}
-impl<T1,T2> stud<T1,T2>{
-    fn init( id:T1,name:T2)->stud<T1,T2>{
-         stud{id,name}
-    }
-}
-
-
-impl<T1,T2> stud<T1,T2>{
-    fn handle_client(mut stream: TcpStream,id:T1,name:T2) -> Result<(), Error>{
+ 
+/**
+ *处理客户端的类
+ */
+fn handle_client(mut stream:TcpStream) -> Result<(), Error>{
+    //一次最多读取512 byte
       let mut buf=[0;512];
       for _ in 0..100 {
+        //每次接受数据前初始化一次，去掉上次接受的数据残留  
         buf=[0;512];
         let bytes_read=stream.read(&mut buf)?;
         if bytes_read == 0{
         return  Ok(());
         }
-       
+       //将byte转为utf-8格式的字符串
        let s= String::from_utf8_lossy(&buf);
         println!("收到客户端消息:{}",s);
+        //将内容回输入回去
         stream.write(&buf[..bytes_read])?;
+        //线程停顿，避免占用cpu过高
         thread::sleep(time::Duration::from_secs(1 as u64));
       }
          Ok(())
     }
-} 
 
-fn main()  -> std::io::Result<()>{
-    let mut studServer= stud::init("超级赛亚人","悟吉塔");
+
+    /**
+     *程序入口
+     */  
+    fn main()  -> std::io::Result<()>{
+
+        //绑定接口
     let listener=TcpListener::bind("127.0.0.1:8000")?;
+    //定义一个Vec保存线程
     let mut thread_vec:Vec<thread::JoinHandle<()>>=Vec::new();
-
+    let mut index=1;
+    //此处阻塞方法，等有客户端链接后进入
     for stream in listener.incoming(){
-        println!("进入");
-        let stream=stream.expect("faild");
+        println!("有客户端进入");
+        //出现异常后返回信息
+        let stream=stream.expect("出现异常");
+         //这个线程中使用了主线程的index变量，并且使用move关键字，所以在这线程之后不能在使用index
         let handle=thread::spawn(move || {
-            println!("线程内");
-            stud::handle_client(stream,"这是服务端id","这是服务端姓名").unwrap_or_else(|error| eprintln!("{:?}",error));
+            println!("线程:{}",index);
+           handle_client(stream).unwrap_or_else(|error| eprintln!("{:?}",error));
+           //此处可以发现index永远是1，说明线程内的数据，不会逃逸。
+           index=index+1;
         });
         thread_vec.push(handle);
     }
@@ -54,60 +58,4 @@ fn main()  -> std::io::Result<()>{
         handle.join().unwrap();
     }
     Ok(())
- /*
-let handle= thread::spawn(move || {
-    for i in 0..6 {
-        let st1= stud::init(i, String::from("悟吉塔"));
-        println!("Hello, world! {:#?} ",st1);
-        println!("值是{}",test_func());
-        let  a= i;
-        match a {
-            1=>{
-                println!("这是{}",i);
-            },
-            2=>{
-                println!("这是2");
-            },
-            3=>{
-                println!("这是3");
-            },
-             4=>{
-                println!("这是4");
-            }, 
-            5=>{
-                println!("这是5");
-            },
-            _=>{}
-    
-        }
-    }
-});
-
-let (tx,rx) = mpsc::channel();
-
-let _thread1= std::thread::spawn(move || {
-    thread::sleep(Duration::from_millis(1));
-    let val=String::from("这是线程1");
-    println!("进入线程1");
-    tx.send(val).unwrap();
-    println!("传值结束");
-
-});
-
-let _thread2=std::thread::spawn(move || {
-    let val=rx.recv().unwrap();
-    println!("进入线程2");
-    println!("线程1的值:{}",val);
-
-    println!("读值结束");
-});
-thread::sleep(Duration::from_millis(5));
-println!("结束");
-  */
-
-}
-fn test_func()->u32{
-    let a=1;
-    let b=a;
-    return b;
 }
