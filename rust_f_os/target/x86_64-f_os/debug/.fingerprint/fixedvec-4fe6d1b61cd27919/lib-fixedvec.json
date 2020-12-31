@@ -1,0 +1,1 @@
+{"rustc":7348325716121024073,"features":"[]","target":3993834905370922845,"profile":13134100034870027236,"path":14122562674058320135,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"x86_64-f_os/debug/.fingerprint/fixedvec-4fe6d1b61cd27919/dep-lib-fixedvec"}}],"rustflags":["--sysroot","/opt/rust/RustPractice/rust_f_os/target/sysroot"],"metadata":15814174474509048491,"config":0}

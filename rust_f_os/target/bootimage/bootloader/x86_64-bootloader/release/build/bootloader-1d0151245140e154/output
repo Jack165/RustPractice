@@ -1,0 +1,6 @@
+cargo:rustc-link-search=native=/opt/rust/RustPractice/rust_f_os/target/bootimage/bootloader/x86_64-bootloader/release/build/bootloader-1d0151245140e154/out
+cargo:rustc-link-lib=static=kernel_bin-rust_f_os
+cargo:rerun-if-env-changed=KERNEL
+cargo:rerun-if-env-changed=BOOTLOADER_PHYSICAL_MEMORY_OFFSET
+cargo:rerun-if-changed=/opt/rust/RustPractice/rust_f_os/target/x86_64-f_os/debug/rust_f_os
+cargo:rerun-if-changed=build.rs
