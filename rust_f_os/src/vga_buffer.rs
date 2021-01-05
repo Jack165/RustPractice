@@ -99,7 +99,8 @@ impl Writer {
                 // 可以是能打印的ASCII码字节，也可以是换行符
                 0x20...0x7e | b'\n' => self.write_byte(byte),
                 // 不包含在上述范围之内的字节
-                _ => self.write_byte(0xfe),
+                //_ => self.write_byte(0xfe),
+                _ => self.write_byte(byte),
             }
 
         }
@@ -140,14 +141,23 @@ impl Write for Writer {
     }
 }
 
-pub fn print_something() {
-    let mut writer = Writer {
-        column_position: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::Black),
-        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
-    };
 
-    writer.write_byte(b'H');
-    writer.write_string("aaaaaello! ");
-    write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
+
+//打印函数
+
+#[macro_export]
+macro_rules! print {
+    ($($arg:tt)*) => ($crate::vga_buffer::_print(format_args!($($arg)*)));
+}
+
+#[macro_export]
+macro_rules! println {
+    () => ($crate::print!("\n"));
+    ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
+}
+use core::fmt::Arguments;
+#[doc(hidden)]
+pub fn _print(args: Arguments) {
+   
+    WRITER.lock().write_fmt(args).unwrap();
 }

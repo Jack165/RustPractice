@@ -7,10 +7,12 @@ mod vga_buffer;
 /// 这个函数将在panic时被调用
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
+    println!("{}", _info);
     loop {}
 }
 
 static HELLO: &[u8] = b"Hello World!";
+
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
@@ -25,9 +27,7 @@ pub extern "C" fn _start() -> ! {
         }
     }
     */
-    use core::fmt::Write;
-    vga_buffer::WRITER.lock().write_str("Hello again").unwrap();
-    write!(vga_buffer::WRITER.lock(), ", some numbers: {} {}", 42, 1.337).unwrap();
-
+   // panic!("Some panic message");
+    println!("中文 World{}", "!");
     loop {}
 }
