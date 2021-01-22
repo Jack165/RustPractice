@@ -1,1 +1,0 @@
-{"rustc":7348325716121024073,"features":"[]","target":8524337025134985022,"profile":13134100034870027236,"path":5751199752566204831,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"x86_64-f_os/debug/.fingerprint/spin-3be0cea12a53988f/dep-lib-spin"}}],"rustflags":["--sysroot","/opt/rust/RustPractice/rust_f_os/target/sysroot"],"metadata":6620005600999123125,"config":0}
